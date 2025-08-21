@@ -1,23 +1,26 @@
 import React, { useState, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import cn from 'classnames';
-import { peopleFromServer } from './data/people';
 import { Person } from './types/Person';
 
 type Props = {
+  onSelected: (person: Person | null) => void;
+  debounceDelay?: number;
   selectedPerson: Person | null;
-  onSelectPerson: (person: Person | null) => void;
+  people: Person[];
 };
 export const Autocomplete: React.FC<Props> = ({
-  selectedPerson,
-  onSelectPerson,
+  onSelected,
+  debounceDelay,
+  selectedPerson = 300,
+  people,
 }) => {
   const [query, setQuery] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
 
   const debouncedSetQuery = useMemo(
-    () => debounce((value: string) => setQuery(value), 300),
-    [],
+    () => debounce((value: string) => setQuery(value), debounceDelay),
+    [debounceDelay],
   );
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -26,20 +29,20 @@ export const Autocomplete: React.FC<Props> = ({
     debouncedSetQuery(value);
 
     if (selectedPerson) {
-      onSelectPerson(null);
+      onSelected(null);
     }
   };
 
   const handlePersonSelect = (person: Person) => {
-    onSelectPerson(person);
+    onSelected(person);
     setQuery(person.name);
   };
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filterPeople = (people: Person[]): Person[] => {
+  const filterPeople = (peoples: Person[]): Person[] => {
     if (!normalizedQuery) {
-      return people;
+      return peoples;
     }
 
     return people.filter(person =>
@@ -47,7 +50,7 @@ export const Autocomplete: React.FC<Props> = ({
     );
   };
 
-  const filteredPeople = filterPeople(peopleFromServer);
+  const filteredPeople = filterPeople(people);
 
   const noMatching = normalizedQuery !== '' && filteredPeople.length === 0;
 
