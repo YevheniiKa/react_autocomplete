@@ -1,19 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import cn from 'classnames';
+import { peopleFromServer } from './data/people';
 import { Person } from './types/Person';
 
 type Props = {
-  onSelected: (person: Person | null) => void;
-  debounceDelay?: number;
   selectedPerson: Person | null;
-  people: Person[];
+  debounceDelay?: number;
+  onSelected: (person: Person | null) => void;
 };
 export const Autocomplete: React.FC<Props> = ({
+  selectedPerson,
   onSelected,
-  debounceDelay,
-  selectedPerson = 300,
-  people,
+  debounceDelay = 300,
 }) => {
   const [query, setQuery] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
@@ -40,9 +39,9 @@ export const Autocomplete: React.FC<Props> = ({
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filterPeople = (peoples: Person[]): Person[] => {
+  const filterPeople = (people: Person[]): Person[] => {
     if (!normalizedQuery) {
-      return peoples;
+      return people;
     }
 
     return people.filter(person =>
@@ -50,7 +49,7 @@ export const Autocomplete: React.FC<Props> = ({
     );
   };
 
-  const filteredPeople = filterPeople(people);
+  const filteredPeople = filterPeople(peopleFromServer);
 
   const noMatching = normalizedQuery !== '' && filteredPeople.length === 0;
 
