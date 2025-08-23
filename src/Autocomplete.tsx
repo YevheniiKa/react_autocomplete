@@ -1,18 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import cn from 'classnames';
-import { peopleFromServer } from './data/people';
 import { Person } from './types/Person';
 
 type Props = {
   selectedPerson: Person | null;
-  debounceDelay?: number;
   onSelected: (person: Person | null) => void;
+  debounceDelay?: number;
+  people: Person[];
 };
 export const Autocomplete: React.FC<Props> = ({
   selectedPerson,
   onSelected,
   debounceDelay = 300,
+  people,
 }) => {
   const [query, setQuery] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
@@ -39,9 +40,9 @@ export const Autocomplete: React.FC<Props> = ({
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filterPeople = (people: Person[]): Person[] => {
+  const filterPeople = (peoples: Person[]): Person[] => {
     if (!normalizedQuery) {
-      return people;
+      return peoples;
     }
 
     return people.filter(person =>
@@ -49,7 +50,7 @@ export const Autocomplete: React.FC<Props> = ({
     );
   };
 
-  const filteredPeople = filterPeople(peopleFromServer);
+  const filteredPeople = filterPeople(people);
 
   const noMatching = normalizedQuery !== '' && filteredPeople.length === 0;
 
@@ -76,7 +77,9 @@ export const Autocomplete: React.FC<Props> = ({
                   className="dropdown-item"
                   data-cy="suggestion-item"
                   key={person.slug}
-                  onMouseDown={() => handlePersonSelect(person)}
+                  onMouseDown={() => {
+                    handlePersonSelect(person);
+                  }}
                 >
                   <p
                     className={cn({

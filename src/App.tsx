@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.scss';
 import { Autocomplete } from './Autocomplete';
 import { Person } from './types/Person';
+import { peopleFromServer } from './data/people';
 
 export const App: React.FC = () => {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
@@ -17,6 +18,7 @@ export const App: React.FC = () => {
         <Autocomplete
           selectedPerson={selectedPerson}
           onSelected={setSelectedPerson}
+          people={peopleFromServer}
         />
       </main>
     </div>
